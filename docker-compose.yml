@@ -31,7 +31,9 @@ services:
       # STAGING=true
     volumes:
       - ./nginx/proxy-confs:/config/nginx/proxy-confs
+      - ./nginx/site-confs:/config/nginx/site-confs
       - /srv:/config/www
+      - log-storage:/config/log
       
   influxdb:
     << : *default
@@ -73,7 +75,7 @@ services:
       GF_SMTP_HOST: "smtp:25"
       GF_SMTP_SKIP_VERIFY: "true"
       GF_SMTP_FROM_ADDRESS: "no-reply@grafana.${DOMAIN?err}"
-      GF_INSTALL_PLUGINS: "raintank-worldping-app,ryantxu-ajax-panel,fetzerch-sunandmoon-datasource,andig-darksky-datasource"
+      GF_INSTALL_PLUGINS: "raintank-worldping-app,ryantxu-ajax-panel,fetzerch-sunandmoon-datasource,andig-darksky-datasource,grafana-influxdb-flux-datasource"
       TZ: Australia/Canberra
   smtp:
     << : *default
@@ -104,8 +106,21 @@ services:
       DATAACTTOKEN: "${TELEGRAF_DATAACTTOKEN}"
     volumes: 
       - ./telegraf/telegraf-public.conf:/etc/telegraf/telegraf.conf:ro
+  telegraf-personal:
+      << : *telegraf
+      container_name: telegraf-personal
+      environment:
+        INFLUXDB_URL: http://influxdb:8086
+        INFLUXDB_DATABASE: ${TELEGRAF_PERSONAL_DATABASE}
+        INFLUXDB_USER: "${TELEGRAF_PERSONAL_USER?err}"
+        INFLUXDB_PASSWORD: "${TELEGRAF_PERSONAL_PASSWORD?err}"
+      volumes: 
+        - ./telegraf/telegraf-personal.conf:/etc/telegraf/telegraf.conf:ro
+        - /var/run/docker.sock:/var/run/docker.sock
+        - log-storage:/var/log/
 volumes:
   grafana-storage: 
   influxdb-storage:
+  log-storage:
 networks:
   influxdb-net: {}
