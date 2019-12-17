@@ -14,7 +14,7 @@ services:
   nginx:
     << : *default
     image: linuxserver/letsencrypt
-    container_name: letsencrypt
+    container_name: nginx
     ports:
       - '80:80'
       - '443:443'
