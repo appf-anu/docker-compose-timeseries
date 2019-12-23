@@ -37,7 +37,7 @@ services:
       
   influxdb:
     << : *default
-    container_name: inflxudb
+    container_name: influxdb
     image: influxdb:${INFLUXDB_VERSION?err}-alpine
     ports:
       - '8086:8086'
