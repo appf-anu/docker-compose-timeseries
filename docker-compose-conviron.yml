@@ -1,29 +1,49 @@
 version: '3.7'
 
-x-conviron:
-  &conviron
+x-conviron-monitor:
+  &conviron-monitor
   image: "appf/controller-conviron:0.2.5"
-  container_name: controller-conviron-test
   labels: # these are just for filtering easily
     type: monitor 
     conviron: "true"
   environment:
+    TZ: Australia/Brisbane
     GROUP_TAG: "http-monitored"
     USE_HTTP: "true" # if this is set to "false", then you need to specify the telnet port in ADDRESS like "10.132.11.135:23"
   networks:
     - telegraf-net
 
+x-conviron-control:
+  &conviron-control
+    image: "appf/controller-conviron:0.2.5"
+    labels: # these are just for filtering easily
+      type: control
+      conviron: "true"
+    environment:
+      TZ: Australia/Brisbane # make sure to set the timezone for the container.
+      GROUP_TAG: "http-controlled"
+      USE_HTTP: "true" # if this is set to "false", then you need to specify the telnet port in ADDRESS like "10.132.11.135:23"
+    networks:
+      - telegraf-net
+
+
 services:
-  controller-conviron1:
-    <<: *conviron
+  monitor-conviron1:
+    <<: *conviron-monitor
+    container_name: conviron-monitor-01
     environment:
       ADDRESS: "10.132.11.135" # this is the ip address of the chamber, without the port
-      NAME: "test-chamber" # change this to the name of your chamber
-  controller-conviron2:
-    <<: *conviron
+      NAME: "conviron-monitor-01" # change this to the name of your chamber
+
+  control-conviron1:
+    <<: *conviron-control
+    container_name: conviron-control-01
+    volumes:
+      - ./conditions:/data
     environment:
       ADDRESS: "10.132.11.136" # this is the ip address of the chamber, without the port
-      NAME: "test-chamber2" # change this to the name of your chamber
+      NAME: conviron-control-1 # change this to the name of your chamber
+      CONDITIONS: "/data/calibration-conditions.xlsx" # this chamber is running calibration conditions.
 
   telegraf-conviron:
     # container name is more important here due to the way controller-conviron sends data
