@@ -83,18 +83,6 @@ services:
     container_name: smtp
     environment:
       - MAILNAME=${DOMAIN?err}
-  telegraf-ttn:
-    << : *telegraf
-    container_name: telegraf-ttn
-    environment:
-      INFLUXDB_URL: http://influxdb:8086
-      INFLUXDB_DATABASE: ${TELEGRAF_TTN_INFLUXDB_DB:-ttn}
-      INFLUXDB_USER: "${TELEGRAF_TTN_INFLUXDB_USER?err}"
-      INFLUXDB_PASSWORD: "${TELEGRAF_TTN_INFLUXDB_PASSWORD?err}"
-      TTN_MESHED_APP_NAME: ${TELEGRAF_TTN_MESHED_APP_NAME?err}
-      TTN_MESHED_PASSWORD: ${TELEGRAF_TTN_MESHED_PASSWORD?err}
-    volumes: 
-      - ./telegraf/telegraf-ttn.conf:/etc/telegraf/telegraf.conf:ro
   telegraf-public:
     << : *telegraf
     container_name: telegraf-public
@@ -103,9 +91,6 @@ services:
       INFLUXDB_DATABASE: public
       INFLUXDB_USER: "${INFLUXDB_PUBLIC_USER?err}"
       INFLUXDB_PASSWORD: "${INFLUXDB_PUBLIC_PASSWORD?err}"
-      DATAACTTOKEN: "${TELEGRAF_DATAACTTOKEN}"
-      OPENWEATHERMAP_API_KEY: "${OPENWEATHERMAP_API_KEY}"
-      OPENWEATHERMAP_CITY_ID: "${OPENWEATHERMAP_CITY_ID}"
     volumes: 
       - ./telegraf/telegraf-public.conf:/etc/telegraf/telegraf.conf:ro
   telegraf-personal:
