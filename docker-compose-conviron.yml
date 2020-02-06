@@ -59,6 +59,6 @@ services:
       INFLUXDB_PASSWORD: "${INFLUXDB_PASSWORD}"
       TZ: Australia/Canberra
     volumes: 
-      - ./telegraf/telegraf-conviron.conf:/etc/telegraf/telegraf.conf:ro
+      - ./telegraf/telegraf-conviron.toml:/etc/telegraf/telegraf.conf:ro
 networks:
   telegraf-net: {}

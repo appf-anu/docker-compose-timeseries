@@ -92,7 +92,7 @@ services:
       INFLUXDB_USER: "${INFLUXDB_PUBLIC_USER?err}"
       INFLUXDB_PASSWORD: "${INFLUXDB_PUBLIC_PASSWORD?err}"
     volumes: 
-      - ./telegraf/telegraf-public.conf:/etc/telegraf/telegraf.conf:ro
+      - ./telegraf/telegraf-public.toml:/etc/telegraf/telegraf.conf:ro
   telegraf-personal:
       << : *telegraf
       container_name: telegraf-personal
@@ -102,9 +102,21 @@ services:
         INFLUXDB_USER: "${TELEGRAF_PERSONAL_USER?err}"
         INFLUXDB_PASSWORD: "${TELEGRAF_PERSONAL_PASSWORD?err}"
       volumes: 
-        - ./telegraf/telegraf-personal.conf:/etc/telegraf/telegraf.conf:ro
+        - ./telegraf/telegraf-personal.toml:/etc/telegraf/telegraf.conf:ro
         - /var/run/docker.sock:/var/run/docker.sock
         - log-storage:/var/log/
+  telegraf-ttn:
+    << : *telegraf
+    container_name: telegraf-ttn
+    environment:
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_DATABASE: ${TELEGRAF_TTN_INFLUXDB_DB:-ttn}
+      INFLUXDB_USER: "${TELEGRAF_TTN_INFLUXDB_USER?err}"
+      INFLUXDB_PASSWORD: "${TELEGRAF_TTN_INFLUXDB_PASSWORD?err}"
+      TTN_MESHED_APP_NAME: ${TELEGRAF_TTN_MESHED_APP_NAME?err}
+      TTN_MESHED_PASSWORD: ${TELEGRAF_TTN_MESHED_PASSWORD?err}
+    volumes: 
+      - ./telegraf/telegraf-ttn.toml:/etc/telegraf/telegraf.conf:ro
 volumes:
   grafana-storage: 
   influxdb-storage:
